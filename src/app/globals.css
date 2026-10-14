@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --bg: #f5f5f8;
+  --surface: #ffffff;
+  --surface-2: #f0f0f5;
+  --line: #e6e6ee;
+  --fg: #101018;
+  --muted: #6b6b7c;
+  --brand: #7c3aed;
+  --brand-soft: #ede9fe;
+  --bar: #7c3aed;
+  --track: #ede9fe;
+  --pos: #047857;
+  --neg: #e11d48;
+  --warn: #b45309;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0a0a0f;
+    --surface: #14141c;
+    --surface-2: #1c1c26;
+    --line: #262633;
+    --fg: #f4f4f8;
+    --muted: #9b9bad;
+    --brand: #8b5cf6;
+    --brand-soft: #2a2140;
+    --bar: #9f7aea;
+    --track: #2a2140;
+    --pos: #34d399;
+    --neg: #fb7185;
+    --warn: #fbbf24;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-bar: var(--bar);
+  --color-track: var(--track);
+  --color-pos: var(--pos);
+  --color-neg: var(--neg);
+  --color-warn: var(--warn);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-surface;
+  }
+  .label {
+    @apply text-xs font-medium text-muted;
+  }
+  .input {
+    @apply w-full rounded-xl border border-line bg-surface-2 px-3.5 py-3 text-base text-fg outline-none transition placeholder:text-muted/70 focus:border-brand focus:ring-2 focus:ring-brand/25;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 font-medium text-white shadow-lg shadow-brand/25 transition active:scale-[0.98] disabled:opacity-60;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-surface px-4 py-3 font-medium transition hover:bg-surface-2 active:scale-[0.98] disabled:opacity-60;
+  }
+  .btn-icon {
+    @apply inline-flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg active:scale-95;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-2 text-sm whitespace-nowrap transition active:scale-95;
+  }
+  .chip[aria-pressed="true"] {
+    @apply border-brand bg-brand-soft font-medium text-fg;
+  }
+}
+
+/* Espaço para a barra de navegação inferior e o "notch" do iPhone */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
