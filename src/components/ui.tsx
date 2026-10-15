@@ -36,7 +36,8 @@ export function Sheet({
             <X className="size-5" />
           </button>
         </div>
-        <div className="overflow-y-auto px-5 pb-6">{children}</div>
+        {/* só rolagem vertical; a rolagem lateral fica restrita às linhas de chips */}
+        <div className="overflow-x-hidden overflow-y-auto overscroll-contain px-5 pb-6">{children}</div>
       </div>
     </div>
   );

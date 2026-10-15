@@ -87,7 +87,7 @@ export function BillForm({ bill, onDone }: { bill?: Bill; onDone: () => void }) 
       </div>
 
       {method === "credito" && cards && cards.length > 0 && (
-        <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5">
+        <div className="flex flex-wrap gap-2">
           {cards.map((c) => (
             <button key={c.id} type="button" className="chip" aria-pressed={card?.id === c.id} onClick={() => setCardId(c.id)}>
               <span className="size-3 rounded-full" style={{ background: c.color }} />

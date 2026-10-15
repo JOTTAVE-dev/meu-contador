@@ -149,7 +149,7 @@ export function TransactionForm({
 
       <div className="grid grid-cols-2 gap-3">
         {kind === "expense" && (
-          <label className="block space-y-1.5">
+          <label className="block min-w-0 space-y-1.5">
             <span className="label">Onde?</span>
             <input
               className="input"
@@ -160,9 +160,16 @@ export function TransactionForm({
             />
           </label>
         )}
-        <label className={`block space-y-1.5 ${kind === "income" ? "col-span-2" : ""}`}>
+        <label className={`block min-w-0 space-y-1.5 ${kind === "income" ? "col-span-2" : ""}`}>
           <span className="label">{kind === "expense" ? "Dia da compra" : "Dia"}</span>
-          <input className="input" type="date" required value={date} onChange={(e) => setDate(e.target.value)} />
+          {/* appearance-none: no iPhone o campo de data nativo é mais largo que a coluna */}
+          <input
+            className="input appearance-none"
+            type="date"
+            required
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
         </label>
       </div>
 
@@ -194,7 +201,7 @@ export function TransactionForm({
               Cadastrar um cartão
             </button>
           ) : (
-            <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5">
+            <div className="flex flex-wrap gap-2">
               {cards?.map((c) => (
                 <button
                   key={c.id}
