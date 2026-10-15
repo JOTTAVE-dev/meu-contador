@@ -1,13 +1,23 @@
 "use client";
 
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, LogOut, Sparkles } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Banknote,
+  CalendarClock,
+  CreditCard,
+  LogOut,
+  QrCode,
+  Sparkles,
+  Wallet,
+} from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { useEditor } from "@/components/Editor";
 import { useMonth } from "@/components/MonthProvider";
 import { MovementRow, toMovements } from "@/components/Rows";
 import { BarList, Empty, PageHeader, Section, Skeleton } from "@/components/ui";
-import { CategoryIcon, METHODS } from "@/lib/constants";
+import { CategoryIcon } from "@/lib/constants";
 import { useBills, useCards, useIncomes, useInstallments, usePaidBills } from "@/lib/data";
 import { currentMonth, money, todayISO } from "@/lib/format";
 import type { Installment } from "@/lib/types";
@@ -33,7 +43,10 @@ export function HomeScreen() {
   const pendingTotal = sum(pendingBills.map((b) => b.amount));
 
   const byCategory = groupSum(installments.data ?? [], (i) => i.expense.category);
-  const byMethod = groupSum(installments.data ?? [], (i) => i.method);
+  const methodTotal = (...methods: string[]) =>
+    sum(installments.data?.filter((i) => methods.includes(i.method)).map((i) => i.amount));
+  const pixDebit = methodTotal("pix", "debito");
+  const others = methodTotal("dinheiro", "boleto");
   const movements = toMovements(incomes.data, installments.data);
   const isCurrent = month === currentMonth();
   const today = Number(todayISO().slice(8));
@@ -85,6 +98,58 @@ export function HomeScreen() {
               </p>
             )}
           </div>
+        )}
+
+        {loading ? (
+          <Skeleton className="h-64" />
+        ) : (
+          <Section title="Gastos do mês">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="card col-span-2 flex items-center gap-4 p-4">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand">
+                  <Wallet className="size-6" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted">Total gasto</p>
+                  <p className="text-2xl font-semibold tracking-tight">{money(totalOut)}</p>
+                  <p className="text-xs text-muted">
+                    {installments.data!.length} {installments.data!.length === 1 ? "lançamento" : "lançamentos"}
+                  </p>
+                </div>
+              </div>
+
+              <SpendCard
+                icon={<QrCode className="size-4" />}
+                label="Débito + Pix"
+                value={pixDebit}
+                note="Sai direto da conta"
+              />
+
+              {cards?.map((c) => (
+                <SpendCard
+                  key={c.id}
+                  color={c.color}
+                  icon={<CreditCard className="size-4" />}
+                  label={c.name}
+                  value={sum(installments.data!.filter((i) => i.card_id === c.id).map((i) => i.amount))}
+                  note={`Fatura · vence dia ${c.due_day}`}
+                />
+              ))}
+
+              {others > 0 && (
+                <SpendCard
+                  icon={<Banknote className="size-4" />}
+                  label="Dinheiro e boleto"
+                  value={others}
+                />
+              )}
+            </div>
+            {cards?.length === 0 && (
+              <p className="px-1 text-xs text-muted">
+                Cadastre seus cartões em <Link href="/cartoes" className="text-brand">Cartões</Link> para ver o gasto de cada um aqui.
+              </p>
+            )}
+          </Section>
         )}
 
         {!loading && movements.length === 0 && pendingBills.length === 0 && (
@@ -151,22 +216,6 @@ export function HomeScreen() {
           </Section>
         )}
 
-        {byMethod.length > 0 && (
-          <Section title="Por forma de pagamento">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {METHODS.filter((m) => byMethod.some(([id]) => id === m.id)).map((m) => (
-                <div key={m.id} className="card p-4">
-                  <p className="flex items-center gap-1.5 text-xs text-muted">
-                    <m.icon className="size-4" />
-                    {m.id === "credito" ? "Faturas" : m.label}
-                  </p>
-                  <p className="mt-1 text-lg font-semibold">{money(byMethod.find(([id]) => id === m.id)![1])}</p>
-                </div>
-              ))}
-            </div>
-          </Section>
-        )}
-
         {movements.length > 0 && (
           <Section
             title="Últimos lançamentos"
@@ -185,6 +234,32 @@ export function HomeScreen() {
         )}
       </main>
     </>
+  );
+}
+
+function SpendCard({
+  icon,
+  label,
+  value,
+  note,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  note?: string;
+  color?: string;
+}) {
+  return (
+    <div className="card relative overflow-hidden p-4">
+      {color && <span className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />}
+      <p className="flex items-center gap-1.5 text-xs text-muted">
+        {icon}
+        <span className="truncate">{label}</span>
+      </p>
+      <p className="mt-1 text-lg font-semibold">{money(value)}</p>
+      {note && <p className="truncate text-[11px] text-muted">{note}</p>}
+    </div>
   );
 }
 
